@@ -1,0 +1,21 @@
+[package]
+name = "horizon-bobby"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.90"
+license = "LGPL-3.0-only"
+description = "Native Horizon Rust port of the Bobby mod: high-performance non-blocking multiplayer chunk caching beyond server view distance"
+publish = false
+
+[lib]
+name = "horizon_bobby"
+path = "src/lib.rs"
+
+[dependencies]
+horizon-core = { path = "../horizon-reference/crates/horizon-core" }
+horizon-world = { path = "../horizon-reference/crates/horizon-world" }
+horizon-protocol = { path = "../horizon-reference/crates/horizon-protocol" }
+flate2 = { version = "1.1.10", default-features = false, features = ["zlib-rs", "runtime_detection"] }
+log = "0.4"
+serde = { version = "1", features = ["derive"] }
+serde_json = { version = "1.0.151", features = ["raw_value"] }

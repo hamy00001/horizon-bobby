@@ -1,0 +1,10 @@
+{
+  "schema": 1,
+  "id": "bobby",
+  "version": "0.1.0",
+  "game": "26.3",
+  "horizon": "b9a80d61999bbe495ed0f5a99a2e6513b032389b",
+  "mixins": "ddd9700b21997c95d95ac6ee5ecafe3830cf622a",
+  "hooks": 1
+}
+

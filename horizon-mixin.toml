@@ -1,0 +1,116 @@
+# Native Horizon Mod Manifest for Bobby (Rust Port)
+# Compatible with horizon-mixins and Horizon's native mod builder.
+
+[mod]
+id = "bobby"
+version = "0.1.0"
+name = "Bobby"
+description = "Allows for render distances greater than the server's view-distance setting by caching chunks on disk in the background."
+
+[compatibility]
+horizon_revision = "b9a80d61999bbe495ed0f5a99a2e6513b032389b"
+
+[[module]]
+id = "bobby_mod"
+file = "crates/horizon-client/src/game.rs"
+name = "bobby_mod"
+source = "mixins/bobby_mod.rs"
+
+# Hook into the client frame loop to update visible chunk tracking, drain completed
+# background fake-chunk loads within a frame budget, and process delayed unloads.
+[[injection]]
+id = "frame"
+hook = "frame"
+hook_version = 1
+kind = "HEAD"
+helper = "mixins/frame.rs"
+bindings = [
+  { name = "game", ty = "&mut crate::game::Game<'_>", value = "&mut *self" }
+]
+
+# Initialize Bobby's FakeChunkManager when joining a client level / dimension.
+[[injection]]
+id = "client_level_load"
+hook = "client_level_load"
+hook_version = 1
+kind = "HEAD"
+helper = "mixins/level_load.rs"
+bindings = [
+  { name = "game", ty = "&mut crate::game::Game<'_>", value = "&mut *self" },
+  { name = "dimension", ty = "&str", value = "dimension" }
+]
+
+# Flush pending saves, close region files, and clean up unused regions on disconnect/unload.
+[[injection]]
+id = "client_level_unload"
+hook = "client_level_unload"
+hook_version = 1
+kind = "HEAD"
+helper = "mixins/level_unload.rs"
+bindings = [
+  { name = "game", ty = "&mut crate::game::Game<'_>", value = "&mut *self" },
+  { name = "dimension", ty = "&str", value = "dimension" }
+]
+
+# Register `/bobby` client commands (`worlds`, `create`, `merge`, `upgrade`, `status`).
+[[injection]]
+id = "commands"
+hook = "commands"
+hook_version = 1
+kind = "HEAD"
+helper = "mixins/commands.rs"
+bindings = [
+  { name = "commands", ty = "&mut Vec<&'static str>", value = "&mut *commands" }
+]
+
+# Handle `/bobby` client command execution.
+[[injection]]
+id = "command"
+hook = "command"
+hook_version = 1
+kind = "HEAD"
+helper = "mixins/command.rs"
+bindings = [
+  { name = "game", ty = "&mut crate::game::Game<'_>", value = "&mut *self" },
+  { name = "command", ty = "&str", value = "command" },
+  { name = "ran", ty = "&mut bool", value = "&mut *ran" }
+]
+
+# Intercept incoming multiplayer chunk packets (ClientboundLevelChunkWithLightPacket):
+# cancel any pending fake-chunk load for (x, z), replace any resident fake chunk,
+# and queue non-blocking disk caching + 64-bit opaque-block fingerprinting.
+[[injection]]
+id = "remote_chunk"
+target = "horizon_client::game::remote_chunks::Game<'_>::remote_chunk"
+kind = "HEAD"
+helper = "mixins/remote_chunk.rs"
+bindings = [
+  { name = "game", ty = "&mut crate::game::Game<'_>", value = "&mut *self" },
+  { name = "p", ty = "&horizon_protocol::packets::play::LevelChunkWithLight", value = "p" }
+]
+
+# Intercept multiplayer chunk unloading (ForgetLevelChunk, SetChunkCacheCenter, SetChunkCacheRadius):
+# snapshot real chunks before removal, queue non-blocking Anvil .mca serialization on the save worker,
+# and substitute FakeChunks for columns that remain within the client's local render distance.
+[[injection]]
+id = "forget_remote_columns"
+target = "horizon_client::game::remote::Game<'_>::forget_remote_columns"
+kind = "HEAD"
+helper = "mixins/forget_remote_columns.rs"
+bindings = [
+  { name = "game", ty = "&mut crate::game::Game<'_>", value = "&mut *self" },
+  { name = "gone", ty = "&mut horizon_client::fast_hash::FxHashSet<(i32, i32)>", value = "&mut *gone" }
+]
+
+# Extend the effective client chunk retention range to cover Bobby's configured max render distance.
+[[injection]]
+id = "remote_chunk_in_range"
+target = "horizon_client::game::remote::Game<'_>::remote_chunk_in_range"
+kind = "RETURN"
+helper = "mixins/remote_chunk_in_range.rs"
+bindings = [
+  { name = "game", ty = "&crate::game::Game<'_>", value = "self" },
+  { name = "x", ty = "i32", value = "x" },
+  { name = "z", ty = "i32", value = "z" },
+  { name = "in_server_range", ty = "bool", value = "$value" }
+]
