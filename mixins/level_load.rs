@@ -1,5 +1,5 @@
-/// `target = "horizon_client::game::native_hooks::Game<'_>::native_client_level_load"`:
-/// initializes `FakeChunkManager` when joining a remote dimension.
+// `target = "horizon_client::game::native_hooks::Game<'_>::native_client_level_load"`:
+// initializes `FakeChunkManager` when joining a remote dimension.
 fn bobby_on_level_load(game: &mut crate::game::Game<'_>, dimension: &str) {
     let Some(remote) = game.remote.as_ref() else {
         return;

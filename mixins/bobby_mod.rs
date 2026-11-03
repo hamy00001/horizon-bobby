@@ -1,6 +1,3 @@
-//! Client-side integration module injected into `horizon_client::game::bobby_mod`
-//! via `horizon-mixin.toml`.
-
 pub const DATA_VERSION: i32 = 4786;
 pub const BOBBY_DIR_NAME: &str = ".bobby";
 

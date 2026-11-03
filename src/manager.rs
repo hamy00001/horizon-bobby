@@ -1,8 +1,3 @@
-//! High-performance, non-blocking fake-chunk manager (`FakeChunkManager`).
-//!
-//! Direct Rust port of `de.johni0702.minecraft.bobby.FakeChunkManager` and
-//! `de.johni0702.minecraft.bobby.mixin.{ClientChunkCacheMixin, ClientPacketListenerMixin, MinecraftMixin}`.
-
 use super::BOBBY_DIR_NAME;
 use super::chunk::CachedChunk;
 use super::config::BobbyConfig;

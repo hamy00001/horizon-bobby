@@ -1,5 +1,5 @@
-/// `target = "horizon_client::game::remote::Game<'_>::remote_chunk_in_range"`:
-/// extends the client chunk retention radius to `max(server_range, bobby_render_distance)`.
+// `target = "horizon_client::game::remote::Game<'_>::remote_chunk_in_range"`:
+// extends the client chunk retention radius to `max(server_range, bobby_render_distance)`.
 fn bobby_remote_chunk_in_range(
     game: &crate::game::Game<'_>,
     x: i32,

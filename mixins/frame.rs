@@ -1,6 +1,6 @@
-/// `target = "horizon_client::game::native_hooks::Game<'_>::native_frame"`:
-/// runs Bobby's frame-budgeted `FakeChunkManager::update`, inserting newly decoded
-/// fake chunks into `game.world` and removing expired ones.
+// `target = "horizon_client::game::native_hooks::Game<'_>::native_frame"`:
+// runs Bobby's frame-budgeted `FakeChunkManager::update`, inserting newly decoded
+// fake chunks into `game.world` and removing expired ones.
 fn bobby_on_frame(game: &mut crate::game::Game<'_>) {
     if let Some(remote) = game.remote.as_ref() {
         let address = remote.session.address.clone();

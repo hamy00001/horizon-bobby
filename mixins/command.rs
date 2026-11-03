@@ -1,5 +1,5 @@
-/// `target = "horizon_client::game::native_hooks::Game<'_>::native_command"`:
-/// handles `/bobby ...` client commands.
+// `target = "horizon_client::game::native_hooks::Game<'_>::native_command"`:
+// handles `/bobby ...` client commands.
 fn bobby_on_command(game: &mut crate::game::Game<'_>, command: &str, ran: &mut bool) {
     if *ran {
         return;

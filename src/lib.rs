@@ -1,14 +1,3 @@
-//! # Horizon Bobby (`horizon-bobby`)
-//!
-//! Native Horizon Rust port of the **Bobby** Minecraft mod (`de.johni0702.minecraft.bobby`).
-//!
-//! Allows render distances greater than the multiplayer server's `view-distance` setting
-//! by intercepting chunk packets, persisting real chunks asynchronously to Anvil `.mca` region
-//! files in `.bobby/<server>/<seed_hash>/<dimension>/`, and streaming cached fake chunks
-//! on a distance-prioritized background worker pool.
-
-#![forbid(unsafe_code)]
-
 pub mod chunk;
 pub mod config;
 pub mod manager;

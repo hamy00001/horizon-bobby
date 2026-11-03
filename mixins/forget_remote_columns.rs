@@ -1,7 +1,7 @@
-/// `target = "horizon_client::game::remote::Game<'_>::forget_remote_columns"`:
-/// intercepts real chunks about to be unloaded by the server (`ForgetLevelChunk`,
-/// `SetChunkCacheCenter`, `SetChunkCacheRadius`), queues non-blocking Anvil `.mca` saving,
-/// and keeps columns that are still within Bobby's client render distance as `FakeChunk`s.
+// `target = "horizon_client::game::remote::Game<'_>::forget_remote_columns"`:
+// intercepts real chunks about to be unloaded by the server (`ForgetLevelChunk`,
+// `SetChunkCacheCenter`, `SetChunkCacheRadius`), queues non-blocking Anvil `.mca` saving,
+// and keeps columns that are still within Bobby's client render distance as `FakeChunk`s.
 fn bobby_on_forget_remote_columns(
     game: &mut crate::game::Game<'_>,
     gone: &mut horizon_client::fast_hash::FxHashSet<(i32, i32)>,

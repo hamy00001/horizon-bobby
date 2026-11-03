@@ -1,9 +1,3 @@
-//! Fake chunk (`CachedChunk`) and section (`CachedSection`) representations.
-//!
-//! Direct Rust port of `de.johni0702.minecraft.bobby.FakeChunk` and
-//! `de.johni0702.minecraft.bobby.ext.FakeChunkData`, bridged with Horizon's
-//! `horizon_world` and `horizon_protocol` chunk primitives.
-
 use horizon_core::position::ChunkPos;
 use horizon_protocol::packets::play::LevelChunkWithLight;
 use horizon_world::chunk::{BlockProperties, BlockState, PalettedContainer};

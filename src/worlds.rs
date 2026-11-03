@@ -1,11 +1,3 @@
-//! Dynamic multi-world detection, fingerprint matching, and region merging (`Worlds`).
-//!
-//! Direct Rust port of `de.johni0702.minecraft.bobby.Worlds`.
-//! When a multiplayer server reuses the same dimension identifier (e.g. `minecraft:overworld`)
-//! across multiple lobbies or sub-worlds, `Worlds` compares 64-bit opaque-block fingerprints
-//! of live chunks against cached worlds (`worlds.meta` and `r.<x>.<z>.meta`) to automatically
-//! select the matching world cache and merge fragmented caches.
-
 use super::storage::FakeChunkStorage;
 use super::tracker::RegionPos;
 use horizon_core::position::ChunkPos;

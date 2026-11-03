@@ -1,7 +1,3 @@
-//! Configuration management for Bobby (`bobby.conf` / `bobby.json`).
-//!
-//! Direct Rust port of `de.johni0702.minecraft.bobby.BobbyConfig`.
-
 use serde::{Deserialize, Serialize};
 use std::fs;
 use std::io;

@@ -1,8 +1,3 @@
-//! Anvil chunk NBT serialization, deserialization, skylight flood-fill fallback,
-//! and 64-bit opaque-block fingerprinting.
-//!
-//! Direct Rust port of `de.johni0702.minecraft.bobby.ChunkSerializer`.
-
 use super::DATA_VERSION;
 use super::chunk::{CachedChunk, CachedSection, LIGHT_LAYER_BYTES, is_air_tag};
 use super::config::BobbyConfig;

@@ -1,8 +1,3 @@
-//! Spatial tracking for visible chunk columns and Anvil 32x32 regions.
-//!
-//! Direct Rust port of `de.johni0702.minecraft.bobby.VisibleChunksTracker`
-//! and `de.johni0702.minecraft.bobby.util.RegionPos`.
-
 use horizon_core::position::ChunkPos;
 use std::fmt;
 

@@ -1,6 +1,6 @@
-/// `target = "horizon_client::game::remote_chunks::ChunkFormat::column"`:
-/// intercepts incoming `LevelChunkWithLight` packets so any pending fake-chunk load is cancelled
-/// and any resident fake chunk at `(p.x, p.z)` is marked as replaced by real server data.
+// `target = "horizon_client::game::remote_chunks::ChunkFormat::column"`:
+// intercepts incoming `LevelChunkWithLight` packets so any pending fake-chunk load is cancelled
+// and any resident fake chunk at `(p.x, p.z)` is marked as replaced by real server data.
 fn bobby_on_remote_chunk(
     p: &horizon_protocol::packets::play::LevelChunkWithLight,
 ) {

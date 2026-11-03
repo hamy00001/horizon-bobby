@@ -1,9 +1,3 @@
-//! Anvil region storage (`r.<x>.<z>.mca`) and `last_access` region timestamp tracking.
-//!
-//! Direct Rust port of `de.johni0702.minecraft.bobby.FakeChunkStorage` and
-//! `de.johni0702.minecraft.bobby.LastAccessFile`, built on top of
-//! `horizon_world::region::{RegionFile, ChunkRecord}` and `Compression::Zlib`.
-
 use super::DATA_VERSION;
 use super::tracker::RegionPos;
 use horizon_core::position::ChunkPos;
