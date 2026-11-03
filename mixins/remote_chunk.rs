@@ -1,9 +1,7 @@
 // `target = "horizon_client::game::remote_chunks::ChunkFormat::column"`:
 // intercepts incoming `LevelChunkWithLight` packets so any pending fake-chunk load is cancelled
 // and any resident fake chunk at `(p.x, p.z)` is marked as replaced by real server data.
-fn bobby_on_remote_chunk(
-    p: &horizon_protocol::packets::play::LevelChunkWithLight,
-) {
+fn bobby_on_remote_chunk(p: &horizon_protocol::packets::play::LevelChunkWithLight) {
     let pos = horizon_core::position::ChunkPos::new(p.x, p.z);
     crate::game::bobby_mod::with_state(|state| {
         state.resident_fakes.remove(&(p.x, p.z));

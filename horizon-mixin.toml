@@ -79,15 +79,3 @@ bindings = [
   { name = "game", ty = "&mut crate::game::Game<'_>", value = "&mut *self" },
   { name = "gone", ty = "&mut horizon_client::fast_hash::FxHashSet<(i32, i32)>", value = "&mut *gone" }
 ]
-
-[[injection]]
-id = "remote_chunk_in_range"
-target = "horizon_client::game::remote::Game<'_>::remote_chunk_in_range"
-kind = "RETURN"
-helper = "mixins/remote_chunk_in_range.rs"
-bindings = [
-  { name = "game", ty = "&crate::game::Game<'_>", value = "self" },
-  { name = "x", ty = "i32", value = "x" },
-  { name = "z", ty = "i32", value = "z" },
-  { name = "in_server_range", ty = "bool", value = "$value" }
-]

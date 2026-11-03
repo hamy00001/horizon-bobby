@@ -2,10 +2,7 @@
 // intercepts real chunks about to be unloaded by the server (`ForgetLevelChunk`,
 // `SetChunkCacheCenter`, `SetChunkCacheRadius`), queues non-blocking Anvil `.mca` saving,
 // and keeps columns that are still within Bobby's client render distance as `FakeChunk`s.
-fn bobby_on_forget_remote_columns(
-    game: &mut crate::game::Game<'_>,
-    gone: &mut horizon_client::fast_hash::FxHashSet<(i32, i32)>,
-) {
+fn bobby_on_forget_remote_columns(game: &mut crate::game::Game<'_>, gone: &mut horizon_client::fast_hash::FxHashSet<(i32, i32)>) {
     if gone.is_empty() {
         return;
     }
@@ -14,11 +11,23 @@ fn bobby_on_forget_remote_columns(
         return;
     }
 
+    let mut keep_existing_fake = Vec::new();
     let mut keep_as_fake = Vec::new();
     for &(x, z) in gone.iter() {
-        // Only snapshot real server chunks, not fake chunks being unloaded.
-        let is_fake = crate::game::bobby_mod::with_state(|s| s.resident_fakes.contains(&(x, z)));
+        // Keep resident fake chunks that are still within Bobby's render distance;
+        // only snapshot real server chunks that are about to be unloaded.
+        let (is_fake, still_in_bobby_range) = crate::game::bobby_mod::with_state(|s| {
+            let fake = s.resident_fakes.contains(&(x, z));
+            let in_range = s
+                .manager
+                .as_ref()
+                .is_some_and(|mgr| mgr.should_be_loaded(x, z));
+            (fake, in_range)
+        });
         if is_fake {
+            if still_in_bobby_range {
+                keep_existing_fake.push((x, z));
+            }
             continue;
         }
         let Some(real_arc) = game.world.chunks.get(&(x, z)).cloned() else {
@@ -37,6 +46,10 @@ fn bobby_on_forget_remote_columns(
         if let Some(fake_chunk) = substitute {
             keep_as_fake.push(((x, z), fake_chunk));
         }
+    }
+
+    for (x, z) in keep_existing_fake {
+        gone.remove(&(x, z));
     }
 
     // Any column that remains within Bobby's local render distance is removed from `gone`
