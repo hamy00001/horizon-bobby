@@ -1,12 +1,32 @@
-/// `hook = "frame"`: runs Bobby's frame-budgeted `FakeChunkManager::update`,
-/// inserting newly decoded fake chunks into `game.world` and removing expired ones.
+/// `target = "horizon_client::game::native_hooks::Game<'_>::native_frame"`:
+/// runs Bobby's frame-budgeted `FakeChunkManager::update`, inserting newly decoded
+/// fake chunks into `game.world` and removing expired ones.
 fn bobby_on_frame(game: &mut crate::game::Game<'_>) {
+    if let Some(remote) = game.remote.as_ref() {
+        let address = remote.session.address.clone();
+        let seed_hash = remote.hashed_seed;
+        let dimension = remote.level.clone();
+        let has_skylight = remote.dimension.has_skylight;
+        let needs_open = crate::game::bobby_mod::with_state(|state| {
+            state.manager.is_none()
+                || state.active_server != address
+                || state.active_seed_hash != seed_hash
+                || state.active_dimension != dimension
+        });
+        if needs_open && !dimension.is_empty() {
+            crate::game::bobby_mod::open_dimension(&address, seed_hash, &dimension, has_skylight);
+        }
+    } else {
+        let was_open = crate::game::bobby_mod::with_state(|state| state.manager.is_some());
+        if was_open {
+            crate::game::bobby_mod::close_dimension();
+        }
+        return;
+    }
+
     let Some(player) = game.player.as_ref() else {
         return;
     };
-    if game.remote.is_none() {
-        return;
-    }
     let player_chunk_x = (player.position.x.floor() as i32) >> 4;
     let player_chunk_z = (player.position.z.floor() as i32) >> 4;
     let client_rd = game.settings.render_distance;
@@ -49,4 +69,3 @@ fn bobby_on_frame(game: &mut crate::game::Game<'_>) {
         }
     }
 }
-

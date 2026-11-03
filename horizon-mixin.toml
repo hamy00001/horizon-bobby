@@ -14,8 +14,7 @@ source = "mixins/bobby_mod.rs"
 
 [[injection]]
 id = "frame"
-hook = "frame"
-hook_version = 1
+target = "horizon_client::game::native_hooks::Game<'_>::native_frame"
 kind = "HEAD"
 helper = "mixins/frame.rs"
 bindings = [
@@ -24,8 +23,7 @@ bindings = [
 
 [[injection]]
 id = "client_level_load"
-hook = "client_level_load"
-hook_version = 1
+target = "horizon_client::game::native_hooks::Game<'_>::native_client_level_load"
 kind = "HEAD"
 helper = "mixins/level_load.rs"
 bindings = [
@@ -35,8 +33,7 @@ bindings = [
 
 [[injection]]
 id = "client_level_unload"
-hook = "client_level_unload"
-hook_version = 1
+target = "horizon_client::game::native_hooks::Game<'_>::native_client_level_unload"
 kind = "HEAD"
 helper = "mixins/level_unload.rs"
 bindings = [
@@ -46,8 +43,7 @@ bindings = [
 
 [[injection]]
 id = "commands"
-hook = "commands"
-hook_version = 1
+target = "horizon_client::game::native_hooks::Game<'_>::native_commands"
 kind = "HEAD"
 helper = "mixins/commands.rs"
 bindings = [
@@ -56,8 +52,7 @@ bindings = [
 
 [[injection]]
 id = "command"
-hook = "command"
-hook_version = 1
+target = "horizon_client::game::native_hooks::Game<'_>::native_command"
 kind = "HEAD"
 helper = "mixins/command.rs"
 bindings = [
@@ -68,11 +63,10 @@ bindings = [
 
 [[injection]]
 id = "remote_chunk"
-target = "horizon_client::game::remote_chunks::Game<'_>::remote_chunk"
+target = "horizon_client::game::remote_chunks::ChunkFormat::column"
 kind = "HEAD"
 helper = "mixins/remote_chunk.rs"
 bindings = [
-  { name = "game", ty = "&mut crate::game::Game<'_>", value = "&mut *self" },
   { name = "p", ty = "&horizon_protocol::packets::play::LevelChunkWithLight", value = "p" }
 ]
 
