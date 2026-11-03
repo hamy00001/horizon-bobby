@@ -8,6 +8,7 @@ horizon_revision = "b9a80d61999bbe495ed0f5a99a2e6513b032389b"
 
 [[module]]
 id = "bobby_mod"
+name = "bobby_mod"
 file = "crates/horizon-client/src/game.rs"
 source = "mixins/bobby_mod.rs"
 
