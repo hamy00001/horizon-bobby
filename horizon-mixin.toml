@@ -4,7 +4,6 @@
 [mod]
 id = "bobby"
 version = "0.1.0"
-name = "Bobby"
 description = "Allows for render distances greater than the server's view-distance setting by caching chunks on disk in the background."
 
 [compatibility]
