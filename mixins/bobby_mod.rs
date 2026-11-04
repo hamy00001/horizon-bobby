@@ -3059,6 +3059,58 @@ pub fn to_client_chunk(
     )
 }
 
+/// Builds visual-only static meshes for every section of a decoded `Chunk`
+/// directly for upload to `game.renderer`, completely bypassing `game.world`.
+pub fn mesh_fake_chunk(
+    game: &crate::game::Game<'_>,
+    chunk: &horizon_client::chunk::Chunk,
+) -> Vec<(i32, horizon_client::mesher::SectionMesh)> {
+    let zoom_seed = game.remote.as_ref().map_or(0, |r| r.hashed_seed);
+    let mut mesher = horizon_client::mesher::Mesher {
+        nether_shading: !game.world.shape.sky_light,
+        shader_pack_lighting: false,
+        separate_ao: false,
+        zoom: horizon_core::biome::BiomeZoom::new(zoom_seed),
+        blend_radius: game.settings.biome_blend,
+        smooth_lighting: game.settings.smooth_lighting,
+        cutout_leaves: game.settings.cutout_leaves,
+        translucent_layers: &[],
+        leaf_culling: horizon_client::graphics::LeafCullingMode::Off,
+        assets: &game.pack.context.assets,
+        render: &game.pack.context.render,
+        tables: &game.pack.context.tables,
+        biomes: &game.pack.context.biomes,
+        visibility: game.pack.context.tables.visibility.clone(),
+    };
+
+    let mut region: [[Option<&horizon_client::chunk::Chunk>; 3]; 3] = [[None; 3]; 3];
+    region[1][1] = Some(chunk);
+    for dz in -1..=1 {
+        for dx in -1..=1 {
+            if dx == 0 && dz == 0 {
+                continue;
+            }
+            if let Some(neighbor) = game.world.chunks.get(&(chunk.x + dx, chunk.z + dz)) {
+                region[(dz + 1) as usize][(dx + 1) as usize] = Some(neighbor.as_ref());
+            }
+        }
+    }
+
+    let mut out = Vec::new();
+    for sy in 0..chunk.sections.len() as i32 {
+        if chunk.sections[sy as usize].is_uniform(0) {
+            continue;
+        }
+        let mut mesh = mesher.mesh(&region, sy);
+        if mesh.solid.is_empty() && mesh.translucent.is_empty() {
+            continue;
+        }
+        mesh.sort_solid();
+        out.push((sy, mesh));
+    }
+    out
+}
+
 /// Handles `/bobby` client subcommands (`worlds`, `create`, `merge`, `upgrade`, `status`).
 pub fn execute_command(game: &mut crate::game::Game<'_>, args: &str) -> String {
     let mut parts = args.split_whitespace();

@@ -1,6 +1,6 @@
 // `target = "horizon_client::game::native_hooks::Game<'_>::native_frame"`:
-// runs Bobby's frame-budgeted `FakeChunkManager::update`, inserting newly decoded
-// fake chunks into `game.world` and removing expired ones.
+// runs Bobby's frame-budgeted `FakeChunkManager::update`, building static visual-only
+// chunk meshes directly into `game.renderer` and bypassing `game.world`.
 fn bobby_on_frame(game: &mut crate::game::Game<'_>) {
     if let Some(remote) = game.remote.as_ref() {
         let address = remote.session.address.clone();
@@ -19,6 +19,12 @@ fn bobby_on_frame(game: &mut crate::game::Game<'_>) {
     } else {
         let was_open = crate::game::bobby_mod::with_state(|state| state.manager.is_some());
         if was_open {
+            let fakes = crate::game::bobby_mod::with_state(|state| {
+                std::mem::take(&mut state.resident_fakes)
+            });
+            if let Some(renderer) = game.renderer.as_mut() {
+                renderer.remove_columns(fakes);
+            }
             crate::game::bobby_mod::close_dimension();
         }
         return;
@@ -51,20 +57,29 @@ fn bobby_on_frame(game: &mut crate::game::Game<'_>) {
         (ev, cfg)
     });
 
-    for pos in events.unloaded_fake_chunks {
-        let _ = game.streaming.forget(&mut game.world, pos.x, pos.z);
+    // 1. Remove expired fake chunks from the renderer (visual-only, not in game.world)
+    if !events.unloaded_fake_chunks.is_empty() {
         if let Some(renderer) = game.renderer.as_mut() {
-            renderer.remove_columns(std::iter::once((pos.x, pos.z)));
+            renderer.remove_columns(events.unloaded_fake_chunks.iter().map(|p| (p.x, p.z)));
         }
     }
 
+    // 2. Build static visual-only meshes for newly loaded fake chunks and upload directly to renderer
     for cached in events.loaded_fake_chunks {
-        let key = (cached.pos.x, cached.pos.z);
-        if let Some(client_chunk) = crate::game::bobby_mod::to_client_chunk(game, &cached, &config)
-        {
-            game.streaming.insert_remote(&mut game.world, client_chunk);
+        let pos = (cached.pos.x, cached.pos.z);
+        // If the chunk is currently loaded as a real ticking chunk in game.world, skip
+        if game.world.chunks.contains_key(&pos) {
+            continue;
+        }
+        if let Some(client_chunk) = crate::game::bobby_mod::to_client_chunk(game, &cached, &config) {
+            let meshes = crate::game::bobby_mod::mesh_fake_chunk(game, &client_chunk);
+            if let Some(renderer) = game.renderer.as_mut() {
+                for (sy, mesh) in meshes {
+                    renderer.upload((pos.0, sy, pos.1), &mesh);
+                }
+            }
             crate::game::bobby_mod::with_state(|state| {
-                state.resident_fakes.insert(key);
+                state.resident_fakes.insert(pos);
             });
         }
     }
