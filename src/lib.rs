@@ -37,8 +37,8 @@ mod hnmod_tests {
         let raw = String::from_utf8_lossy(&bytes);
         assert!(raw.contains("horizon-native.json"));
         assert!(raw.contains("mixins/bobby/horizon-mixin.toml"));
-        assert!(raw.contains("mixins/bobby/mixins/bobby_mod.rs"));
-        assert!(raw.contains("mixins/bobby/mixins/frame.rs"));
+        assert!(raw.contains("mixins/bobby/bobby_mod.rs"));
+        assert!(raw.contains("mixins/bobby/frame.rs"));
     }
 }
 

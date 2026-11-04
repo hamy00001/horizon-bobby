@@ -3149,3 +3149,36 @@ pub fn execute_command(game: &mut crate::game::Game<'_>, args: &str) -> String {
         _ => "Usage: /bobby [status | worlds | create <title> | merge <id> | upgrade]".to_owned(),
     })
 }
+
+/// Builds the labels for Options > Mods > Bobby settings buttons.
+pub fn settings_buttons(buttons: &mut Vec<String>) {
+    with_state(|state| {
+        let enabled_str = if state.config.enabled { "ON" } else { "OFF" };
+        buttons.push(format!("Bobby: {}", enabled_str));
+        buttons.push(format!("Max Render Distance: {}", state.config.max_render_distance));
+        let taint_str = if state.config.taint_fake_chunks { "ON" } else { "OFF" };
+        buttons.push(format!("Taint Fake Chunks: {}", taint_str));
+        let no_be_str = if state.config.no_block_entities { "ON" } else { "OFF" };
+        buttons.push(format!("No Block Entities: {}", no_be_str));
+    });
+}
+
+/// Handles button clicks on Options > Mods > Bobby settings page.
+pub fn settings_click(button: usize) {
+    with_state(|state| {
+        match button {
+            0 => state.config.enabled = !state.config.enabled,
+            1 => {
+                state.config.max_render_distance = match state.config.max_render_distance {
+                    d if d <= 32 => 64,
+                    d if d <= 64 => 128,
+                    _ => 32,
+                };
+            }
+            2 => state.config.taint_fake_chunks = !state.config.taint_fake_chunks,
+            3 => state.config.no_block_entities = !state.config.no_block_entities,
+            _ => {}
+        }
+    });
+}
+
